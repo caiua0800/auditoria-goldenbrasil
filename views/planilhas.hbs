@@ -473,6 +473,69 @@
         .toast.show { transform: translateY(0); opacity: 1; }
         .toast.success { border-left: 4px solid #22c55e; }
         .toast.error { border-left: 4px solid #ef4444; }
+
+        /* ── Modal de confirmação ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(2px);
+        }
+        .modal-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
+        .modal-box {
+            background: #fff;
+            border-radius: var(--radius);
+            padding: 32px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.25s ease;
+        }
+        @keyframes slideUp { from { transform: translateY(20px); opacity:0; } to { transform: translateY(0); opacity:1; } }
+        .modal-icon { font-size: 40px; text-align: center; margin-bottom: 12px; }
+        .modal-title { font-size: 18px; font-weight: 700; text-align: center; margin-bottom: 8px; color: var(--text); }
+        .modal-desc { font-size: 14px; text-align: center; color: var(--text-muted); margin-bottom: 24px; line-height: 1.5; }
+        .modal-desc strong { color: var(--text); }
+        .modal-actions { display: flex; gap: 10px; }
+        .btn-cancel {
+            flex: 1; padding: 11px; border: 1.5px solid var(--border);
+            background: #fff; border-radius: var(--radius-sm);
+            font-size: 14px; font-weight: 600; cursor: pointer; color: var(--text);
+            transition: all 0.2s;
+        }
+        .btn-cancel:hover { background: #f1f5f9; }
+        .btn-danger {
+            flex: 1; padding: 11px; border: none;
+            background: #ef4444; color: #fff; border-radius: var(--radius-sm);
+            font-size: 14px; font-weight: 600; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-danger:disabled { background: #fca5a5; cursor: not-allowed; }
+
+        /* ── Linha de planilha com botão excluir ── */
+        .select-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .select-row .form-control { flex: 1; }
+        .btn-delete-planilha {
+            width: 42px; height: 42px; flex-shrink: 0;
+            border: 1.5px solid #fecaca;
+            background: #fff5f5;
+            border-radius: var(--radius-sm);
+            font-size: 16px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+            color: #ef4444;
+        }
+        .btn-delete-planilha:hover { background: #ef4444; color: #fff; border-color: #ef4444; }
+        .btn-delete-planilha:disabled { opacity: 0.3; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -528,13 +591,18 @@
             <div class="filters-grid">
                 <div class="form-group">
                     <label class="form-label">Base de dados</label>
-                    <select id="planilhaSelector" class="form-control" onchange="carregarDadosDoBanco()">
-                        <option value="">— Selecione uma planilha —</option>
-                        <option value="__todas__">🔍 Pesquisar em todas as planilhas</option>
-                        {{#each planilhas}}
-                            <option value="{{this.id}}">{{this.nomeOriginal}} (ID: {{this.id}})</option>
-                        {{/each}}
-                    </select>
+                    <div class="select-row">
+                        <select id="planilhaSelector" class="form-control" onchange="carregarDadosDoBanco(); atualizarBtnExcluir()">
+                            <option value="">— Selecione uma planilha —</option>
+                            <option value="__todas__">🔍 Pesquisar em todas as planilhas</option>
+                            {{#each planilhas}}
+                                <option value="{{this.id}}">{{this.nomeOriginal}} (ID: {{this.id}})</option>
+                            {{/each}}
+                        </select>
+                        <button class="btn-delete-planilha" id="btnExcluirPlanilha" onclick="abrirModalExcluir()" disabled title="Excluir planilha selecionada">
+                            🗑️
+                        </button>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Pesquisa rápida</label>
@@ -596,6 +664,22 @@
             </div>
         </div>
 
+    </div>
+
+    <!-- Modal de confirmação de exclusão -->
+    <div class="modal-overlay" id="modalExcluir">
+        <div class="modal-box">
+            <div class="modal-icon">🗑️</div>
+            <div class="modal-title">Excluir planilha?</div>
+            <div class="modal-desc">
+                Você está prestes a excluir <strong id="modalNomePlanilha"></strong>.<br>
+                Todos os dados serão removidos permanentemente do banco.
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+                <button class="btn-danger" id="btnConfirmarExcluir" onclick="confirmarExcluir()">Sim, excluir</button>
+            </div>
+        </div>
     </div>
 
     <!-- Toast -->
@@ -856,6 +940,49 @@
             if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
             const set = new Set([1, 2, atual - 1, atual, atual + 1, total - 1, total]);
             return [...set].filter(p => p >= 1 && p <= total).sort((a, b) => a - b);
+        }
+
+        // ── Excluir planilha ─────────────────────────────────────────────
+        function atualizarBtnExcluir() {
+            const id = document.getElementById('planilhaSelector').value;
+            const btn = document.getElementById('btnExcluirPlanilha');
+            // Habilita só se uma planilha real estiver selecionada (não vazio e não __todas__)
+            btn.disabled = !id || id === '__todas__';
+        }
+
+        function abrirModalExcluir() {
+            const sel = document.getElementById('planilhaSelector');
+            const nome = sel.selectedOptions[0].text;
+            document.getElementById('modalNomePlanilha').textContent = nome;
+            document.getElementById('modalExcluir').classList.add('open');
+        }
+
+        function fecharModal() {
+            document.getElementById('modalExcluir').classList.remove('open');
+        }
+
+        // Fecha modal ao clicar fora da caixa
+        document.getElementById('modalExcluir').addEventListener('click', function(e) {
+            if (e.target === this) fecharModal();
+        });
+
+        async function confirmarExcluir() {
+            const id = document.getElementById('planilhaSelector').value;
+            const btn = document.getElementById('btnConfirmarExcluir');
+            btn.disabled = true;
+            btn.textContent = 'Excluindo…';
+
+            try {
+                const res = await fetch('/planilhas/' + id, { method: 'DELETE' });
+                if (!res.ok) throw new Error();
+                showToast('✅ Planilha excluída com sucesso!', 'success');
+                fecharModal();
+                setTimeout(() => location.reload(), 1000);
+            } catch (e) {
+                showToast('❌ Erro ao excluir a planilha', 'error');
+                btn.disabled = false;
+                btn.textContent = 'Sim, excluir';
+            }
         }
 
         // ── Init ─────────────────────────────────────────────────────────

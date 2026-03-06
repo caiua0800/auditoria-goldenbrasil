@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Param, UseInterceptors, UploadedFile, Render } from '@nestjs/common';
+import { Controller, Post, Get, Delete, Param, UseInterceptors, UploadedFile, Render, HttpCode } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -69,5 +69,12 @@ export class PlanilhasController {
   async getDados(@Param('id') id: number) {
     const planilha = await this.repo.findOneBy({ id });
     return planilha ? planilha.dados : [];
+  }
+
+  @Delete(':id')
+  @HttpCode(200)
+  async deletar(@Param('id') id: number) {
+    await this.repo.delete(id);
+    return { message: 'Planilha excluída com sucesso.' };
   }
 }
