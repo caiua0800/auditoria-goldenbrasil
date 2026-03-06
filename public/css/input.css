@@ -1,0 +1,57 @@
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f4f4f9;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container {
+    width: 90%;
+    max-width: 500px;
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border-top: 6px solid #FFD700; /* O "Golden" da Brasil */
+    text-align: center;
+}
+
+h1 {
+    color: #1a1a1a;
+    margin-bottom: 1rem;
+}
+
+.btn-primary {
+    background-color: #FFD700;
+    color: #000;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+    width: 100%;
+    margin-top: 1.5rem;
+}
+
+.btn-primary:hover {
+    background-color: #e6c200;
+}
+
+/* Responsividade */
+@media (max-width: 480px) {
+    .container {
+        width: 95%;
+        padding: 1.5rem;
+    }
+}

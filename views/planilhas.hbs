@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auditoria Golden Brasil - Planilhas</title>
+    <style>
+        :root {
+            --primary: #F5C518;
+            --primary-dark: #b8860b;
+            --primary-light: #fff8dc;
+            --bg: #f0f2f5;
+            --card-bg: #ffffff;
+            --text: #1a1a2e;
+            --text-muted: #6c757d;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+            --shadow-hover: 0 4px 24px rgba(0,0,0,0.12);
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ── Topbar ── */
+        .topbar {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 0 32px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .topbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .topbar-logo {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 18px;
+            color: #1a1a2e;
+        }
+        .topbar-title {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .topbar-title span {
+            color: var(--primary);
+        }
+        .topbar-subtitle {
+            color: #94a3b8;
+            font-size: 12px;
+            margin-top: 1px;
+        }
+        .topbar-badge {
+            background: rgba(245, 197, 24, 0.15);
+            border: 1px solid rgba(245, 197, 24, 0.3);
+            color: var(--primary);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* ── Layout ── */
+        .page {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        /* ── Modo "todas as planilhas" ── */
+        .mode-badge {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: var(--primary);
+            font-size: 13px;
+            font-weight: 700;
+            border: 1px solid rgba(245,197,24,0.3);
+            margin-bottom: 16px;
+            animation: fadeIn 0.3s ease;
+        }
+        .mode-badge.visible { display: flex; }
+        .mode-badge .mode-dot {
+            width: 8px; height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            box-shadow: 0 0 0 3px rgba(34,197,94,0.25);
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse { 0%,100%{box-shadow:0 0 0 3px rgba(34,197,94,0.25)} 50%{box-shadow:0 0 0 6px rgba(34,197,94,0.1)} }
+
+        /* Coluna de planilha no modo todas */
+        .col-planilha {
+            background: rgba(245,197,24,0.08);
+            color: var(--primary-dark);
+            font-weight: 700;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        th.col-planilha {
+            color: var(--primary);
+            background: rgba(245,197,24,0.15);
+        }
+        .planilha-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(245,197,24,0.15);
+            border: 1px solid rgba(245,197,24,0.3);
+            color: var(--primary-dark);
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ── Cards ── */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 28px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+            transition: box-shadow 0.2s;
+        }
+        .card:hover { box-shadow: var(--shadow-hover); }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            background: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text);
+        }
+        .card-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 1px;
+        }
+
+        /* ── Upload ── */
+        .upload-area {
+            border: 2px dashed #d1d5db;
+            padding: 36px 20px;
+            text-align: center;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.25s;
+            background: #fafbfc;
+            position: relative;
+        }
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+        .upload-area.dragover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            transform: scale(1.01);
+        }
+        .upload-icon {
+            font-size: 36px;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .upload-text {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        .upload-hint {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+        .upload-filename {
+            display: none;
+            margin-top: 10px;
+            font-weight: 600;
+            color: var(--primary-dark);
+            font-size: 14px;
+        }
+
+        /* ── Botões ── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 11px 22px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: #1a1a2e;
+            width: 100%;
+            margin-top: 14px;
+            font-size: 15px;
+            padding: 13px;
+        }
+        .btn-primary:hover { background: var(--primary-dark); color: #fff; transform: translateY(-1px); }
+        .btn-primary:active { transform: translateY(0); }
+        .btn-primary:disabled { background: #d1d5db; color: #9ca3af; cursor: not-allowed; transform: none; }
+
+        /* ── Formulário ── */
+        .form-group { margin-bottom: 16px; }
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            color: var(--text);
+            background: #fff;
+            transition: all 0.2s;
+            appearance: none;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(245, 197, 24, 0.18);
+        }
+        select.form-control {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236c757d' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+        }
+
+        /* ── Grid Filtros ── */
+        .filters-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            align-items: end;
+        }
+        @media (max-width: 640px) {
+            .filters-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ── Info Bar ── */
+        .info-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            background: var(--primary-light);
+            border: 1px solid #fde68a;
+            border-radius: var(--radius-sm);
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: var(--primary-dark);
+            font-weight: 600;
+            display: none;
+        }
+        .info-bar.visible { display: flex; }
+
+        /* ── Tabela ── */
+        .table-wrapper {
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 500px;
+            font-size: 13px;
+        }
+        thead {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+        th {
+            color: #e2e8f0;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            padding: 14px 16px;
+            text-align: left;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+        }
+        th:first-child { padding-left: 20px; }
+        td {
+            padding: 11px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
+            vertical-align: middle;
+        }
+        td:first-child { padding-left: 20px; }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: var(--primary-light); }
+        tbody tr:nth-child(even) { background: #fafbfc; }
+        tbody tr:nth-child(even):hover { background: var(--primary-light); }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+        .empty-state .empty-icon { font-size: 48px; display: block; margin-bottom: 12px; }
+        .empty-state p { font-size: 15px; }
+
+        /* ── Paginação ── */
+        .pagination-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0 0;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .pagination-info {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        .pagination-info strong { color: var(--text); }
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .page-size-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        .page-size-select {
+            padding: 5px 28px 5px 10px;
+            border: 1.5px solid var(--border);
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            background: #fff;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 12 12'%3E%3Cpath fill='%236c757d' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            color: var(--text);
+        }
+        .page-size-select:focus { outline: none; border-color: var(--primary); }
+
+        .page-btn {
+            width: 34px;
+            height: 34px;
+            border: 1.5px solid var(--border);
+            background: #fff;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text);
+            transition: all 0.15s;
+        }
+        .page-btn:hover:not(:disabled) {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            color: var(--primary-dark);
+        }
+        .page-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #1a1a2e;
+        }
+        .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .page-btn.wide { width: auto; padding: 0 12px; }
+
+        /* ── Loader ── */
+        .loader-wrap {
+            display: none;
+            text-align: center;
+            padding: 50px 20px;
+        }
+        .spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid #e2e8f0;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.3s ease; }
+
+        /* ── Toast ── */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #1a1a2e;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            z-index: 9999;
+            transform: translateY(80px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.success { border-left: 4px solid #22c55e; }
+        .toast.error { border-left: 4px solid #ef4444; }
+    </style>
+</head>
+<body>
+
+    <!-- Topbar -->
+    <nav class="topbar">
+        <div class="topbar-brand">
+            <div class="topbar-logo">G</div>
+            <div>
+                <div class="topbar-title">Golden <span>Brasil</span></div>
+                <div class="topbar-subtitle">Sistema de Auditoria</div>
+            </div>
+        </div>
+        <div class="topbar-badge">📊 Planilhas</div>
+    </nav>
+
+    <div class="page">
+
+        <!-- Card Upload -->
+        <div class="card fade-in">
+            <div class="card-header">
+                <div class="card-icon">📁</div>
+                <div>
+                    <div class="card-title">Importar Nova Planilha</div>
+                    <div class="card-desc">Envie um arquivo CSV para processar e armazenar no banco de dados</div>
+                </div>
+            </div>
+
+            <div class="upload-area" id="uploadArea" onclick="document.getElementById('csvFile').click()">
+                <span class="upload-icon">📂</span>
+                <p class="upload-text">Clique para selecionar ou arraste o arquivo aqui</p>
+                <p class="upload-hint">Suporte para arquivos .CSV</p>
+                <input type="file" id="csvFile" hidden accept=".csv" onchange="updateFileName()">
+                <p class="upload-filename" id="fileNameDisplay"></p>
+            </div>
+
+            <button onclick="enviarArquivo()" class="btn btn-primary" id="btnEnviar">
+                <span id="btnText">⬆️ Processar e Salvar no Banco</span>
+                <div class="spinner" id="uploadSpinner" style="display:none; width:18px; height:18px; border-width:2px;"></div>
+            </button>
+        </div>
+
+        <!-- Card Explorar -->
+        <div class="card fade-in">
+            <div class="card-header">
+                <div class="card-icon">🔍</div>
+                <div>
+                    <div class="card-title">Explorar Planilhas</div>
+                    <div class="card-desc">Visualize e filtre os dados armazenados no banco</div>
+                </div>
+            </div>
+
+            <div class="filters-grid">
+                <div class="form-group">
+                    <label class="form-label">Base de dados</label>
+                    <select id="planilhaSelector" class="form-control" onchange="carregarDadosDoBanco()">
+                        <option value="">— Selecione uma planilha —</option>
+                        <option value="__todas__">🔍 Pesquisar em todas as planilhas</option>
+                        {{#each planilhas}}
+                            <option value="{{this.id}}">{{this.nomeOriginal}} (ID: {{this.id}})</option>
+                        {{/each}}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Pesquisa rápida</label>
+                    <input type="text" id="busca" class="form-control" placeholder="🔎  Digite para filtrar..." oninput="filtrarTabela()">
+                </div>
+            </div>
+
+            <!-- Badge modo "todas" -->
+            <div class="mode-badge" id="modeBadge">
+                <span class="mode-dot"></span>
+                Modo: Pesquisa em todas as planilhas
+                <span id="modePlanilhasCount" style="opacity:.7; font-weight:400;"></span>
+            </div>
+
+            <!-- Info bar -->
+            <div class="info-bar" id="infoBar">
+                <span id="infoText">—</span>
+                <span id="infoCount" style="font-size:12px; opacity:.8;"></span>
+            </div>
+
+            <!-- Loader -->
+            <div class="loader-wrap" id="loaderWrap">
+                <div class="spinner"></div>
+                <p style="font-size:14px; color:var(--text-muted);">Carregando dados...</p>
+            </div>
+
+            <!-- Tabela -->
+            <div id="tableSection" style="display:none;">
+                <div class="table-wrapper">
+                    <table id="tabelaDados">
+                        <thead id="thead"></thead>
+                        <tbody id="tbody"></tbody>
+                    </table>
+                </div>
+
+                <!-- Paginação -->
+                <div class="pagination-bar" id="paginationBar">
+                    <div class="pagination-info" id="paginationInfo"></div>
+
+                    <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+                        <div class="page-size-wrap">
+                            <span>Itens por página:</span>
+                            <select class="page-size-select" id="pageSizeSelect" onchange="mudarTamanho()">
+                                <option value="10">10</option>
+                                <option value="20" selected>20</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                        <div class="pagination-controls" id="paginationControls"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty -->
+            <div class="empty-state" id="emptyState" style="display:none;">
+                <span class="empty-icon">📋</span>
+                <p>Selecione uma planilha para visualizar os dados.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ── Estado ──────────────────────────────────────────────────────
+        let dadosBrutos    = [];   // todos os dados da planilha (ou de todas)
+        let dadosFiltrados = [];   // após filtro de busca
+        let paginaAtual    = 1;
+        let itensPorPagina = 20;
+        let modoTodas      = false; // true quando "todas as planilhas" está ativo
+
+        // ── Toast ────────────────────────────────────────────────────────
+        function showToast(msg, type = 'success') {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = `toast ${type} show`;
+            setTimeout(() => t.className = `toast ${type}`, 3000);
+        }
+
+        // ── Upload ───────────────────────────────────────────────────────
+        const uploadArea = document.getElementById('uploadArea');
+        uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+        uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+        uploadArea.addEventListener('drop', e => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.name.endsWith('.csv')) {
+                document.getElementById('csvFile').files = e.dataTransfer.files;
+                updateFileName();
+            }
+        });
+
+        function updateFileName() {
+            const input = document.getElementById('csvFile');
+            if (input.files.length > 0) {
+                const el = document.getElementById('fileNameDisplay');
+                el.style.display = 'block';
+                el.textContent = '✅ ' + input.files[0].name;
+            }
+        }
+
+        async function enviarArquivo() {
+            const fileInput = document.getElementById('csvFile');
+            if (!fileInput.files[0]) { showToast('⚠️ Selecione um arquivo primeiro!', 'error'); return; }
+
+            const btn     = document.getElementById('btnEnviar');
+            const spinner = document.getElementById('uploadSpinner');
+            const text    = document.getElementById('btnText');
+
+            btn.disabled = true;
+            text.textContent = 'Enviando…';
+            spinner.style.display = 'block';
+
+            try {
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+                await fetch('/planilhas/upload', { method: 'POST', body: formData });
+                showToast('✅ Planilha importada com sucesso!', 'success');
+                setTimeout(() => location.reload(), 1200);
+            } catch (err) {
+                showToast('❌ Erro ao enviar o arquivo', 'error');
+                btn.disabled = false;
+                spinner.style.display = 'none';
+                text.textContent = '⬆️ Processar e Salvar no Banco';
+            }
+        }
+
+        // ── Carregar dados ───────────────────────────────────────────────
+        async function carregarDadosDoBanco() {
+            const id = document.getElementById('planilhaSelector').value;
+
+            document.getElementById('tableSection').style.display = 'none';
+            document.getElementById('emptyState').style.display   = 'none';
+            document.getElementById('infoBar').classList.remove('visible');
+            document.getElementById('modeBadge').classList.remove('visible');
+
+            if (!id) {
+                modoTodas = false;
+                document.getElementById('emptyState').style.display = 'block';
+                return;
+            }
+
+            document.getElementById('loaderWrap').style.display = 'block';
+            document.getElementById('busca').value = '';
+
+            try {
+                let url;
+                if (id === '__todas__') {
+                    modoTodas = true;
+                    url = '/planilhas/dados/todas';
+                } else {
+                    modoTodas = false;
+                    url = '/planilhas/dados/' + id;
+                }
+
+                const res = await fetch(url);
+                dadosBrutos = await res.json();
+                dadosFiltrados = [...dadosBrutos];
+                paginaAtual = 1;
+
+                if (modoTodas) {
+                    // conta quantas planilhas distintas vieram
+                    const distintas = new Set(dadosBrutos.map(r => r.__id__)).size;
+                    document.getElementById('modeBadge').classList.add('visible');
+                    document.getElementById('modePlanilhasCount').textContent =
+                        `— ${distintas} planilha${distintas !== 1 ? 's' : ''} · ${dadosBrutos.length} registros`;
+                }
+
+                renderizarPagina();
+                atualizarInfoBar();
+            } catch (e) {
+                showToast('❌ Erro ao buscar os dados', 'error');
+            } finally {
+                document.getElementById('loaderWrap').style.display = 'none';
+            }
+        }
+
+        // ── Filtro ───────────────────────────────────────────────────────
+        function filtrarTabela() {
+            const termo = document.getElementById('busca').value.toLowerCase().trim();
+            if (termo) {
+                dadosFiltrados = dadosBrutos.filter(linha =>
+                    Object.entries(linha)
+                        .filter(([k]) => k !== '__id__')   // ignora campo interno de id
+                        .some(([, v]) => String(v).toLowerCase().includes(termo))
+                );
+            } else {
+                dadosFiltrados = [...dadosBrutos];
+            }
+            paginaAtual = 1;
+            renderizarPagina();
+            atualizarInfoBar();
+        }
+
+        // ── Seletor de itens por página ──────────────────────────────────
+        function mudarTamanho() {
+            itensPorPagina = parseInt(document.getElementById('pageSizeSelect').value);
+            paginaAtual = 1;
+            renderizarPagina();
+        }
+
+        // ── Info bar ─────────────────────────────────────────────────────
+        function atualizarInfoBar() {
+            const bar = document.getElementById('infoBar');
+            if (dadosBrutos.length === 0) { bar.classList.remove('visible'); return; }
+            bar.classList.add('visible');
+
+            if (modoTodas) {
+                const busca = document.getElementById('busca').value.trim();
+                document.getElementById('infoText').textContent = busca
+                    ? `Resultados para "${busca}" em todas as planilhas`
+                    : 'Todas as planilhas';
+            } else {
+                const nome = document.getElementById('planilhaSelector').selectedOptions[0].text;
+                document.getElementById('infoText').textContent = nome;
+            }
+
+            document.getElementById('infoCount').textContent =
+                dadosFiltrados.length !== dadosBrutos.length
+                    ? `${dadosFiltrados.length} de ${dadosBrutos.length} registros`
+                    : `${dadosBrutos.length} registros`;
+        }
+
+        // ── Render página ────────────────────────────────────────────────
+        function renderizarPagina() {
+            if (!dadosFiltrados || dadosFiltrados.length === 0) {
+                document.getElementById('tableSection').style.display = 'none';
+                document.getElementById('emptyState').style.display   = 'block';
+                document.getElementById('emptyState').innerHTML =
+                    '<span class="empty-icon">🔍</span><p>Nenhum resultado encontrado para a pesquisa.</p>';
+                return;
+            }
+
+            document.getElementById('tableSection').style.display = 'block';
+            document.getElementById('emptyState').style.display   = 'none';
+
+            const totalPaginas = Math.ceil(dadosFiltrados.length / itensPorPagina);
+            if (paginaAtual > totalPaginas) paginaAtual = totalPaginas;
+
+            const inicio = (paginaAtual - 1) * itensPorPagina;
+            const fim    = Math.min(inicio + itensPorPagina, dadosFiltrados.length);
+            const slice  = dadosFiltrados.slice(inicio, fim);
+
+            // Filtra colunas internas (__planilha__, __id__) da listagem normal
+            const todasColunas = Object.keys(dadosFiltrados[0]);
+            const colunas = todasColunas.filter(c => c !== '__planilha__' && c !== '__id__');
+            const thead = document.getElementById('thead');
+            const tbody = document.getElementById('tbody');
+
+            // Cabeçalho — em modo "todas" adiciona coluna Planilha no início
+            if (modoTodas) {
+                thead.innerHTML = '<tr>' +
+                    '<th class="col-planilha">📋 Planilha</th>' +
+                    colunas.map(c => `<th>${c}</th>`).join('') +
+                    '</tr>';
+            } else {
+                thead.innerHTML = '<tr>' + colunas.map(c => `<th>${c}</th>`).join('') + '</tr>';
+            }
+
+            // Corpo
+            tbody.innerHTML = slice.map(linha => {
+                let cells = '';
+                if (modoTodas) {
+                    cells += `<td class="col-planilha"><span class="planilha-tag" title="${linha.__planilha__ ?? ''}">📄 ${linha.__planilha__ ?? ''}</span></td>`;
+                }
+                cells += colunas.map(col => `<td>${linha[col] ?? ''}</td>`).join('');
+                return `<tr>${cells}</tr>`;
+            }).join('');
+
+            // Info de paginação
+            document.getElementById('paginationInfo').innerHTML =
+                `Exibindo <strong>${inicio + 1}–${fim}</strong> de <strong>${dadosFiltrados.length}</strong> registros`;
+
+            renderizarControlesPaginacao(totalPaginas);
+        }
+
+        // ── Controles de paginação ────────────────────────────────────────
+        function renderizarControlesPaginacao(totalPaginas) {
+            const container = document.getElementById('paginationControls');
+            container.innerHTML = '';
+
+            const criarBtn = (label, page, active = false, disabled = false) => {
+                const btn = document.createElement('button');
+                btn.className = 'page-btn' + (active ? ' active' : '') + (label.length > 2 ? ' wide' : '');
+                btn.innerHTML = label;
+                btn.disabled  = disabled;
+                if (!disabled && !active) btn.onclick = () => { paginaAtual = page; renderizarPagina(); };
+                return btn;
+            };
+
+            // ← Anterior
+            container.appendChild(criarBtn('‹', paginaAtual - 1, false, paginaAtual === 1));
+
+            // Páginas numéricas com reticências
+            const pages = paginas(paginaAtual, totalPaginas);
+            let last = 0;
+            pages.forEach(p => {
+                if (p - last > 1) {
+                    const dots = document.createElement('button');
+                    dots.className = 'page-btn wide';
+                    dots.textContent = '…';
+                    dots.disabled = true;
+                    container.appendChild(dots);
+                }
+                container.appendChild(criarBtn(String(p), p, p === paginaAtual));
+                last = p;
+            });
+
+            // → Próximo
+            container.appendChild(criarBtn('›', paginaAtual + 1, false, paginaAtual === totalPaginas));
+        }
+
+        // Gera quais números de página mostrar
+        function paginas(atual, total) {
+            if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+            const set = new Set([1, 2, atual - 1, atual, atual + 1, total - 1, total]);
+            return [...set].filter(p => p >= 1 && p <= total).sort((a, b) => a - b);
+        }
+
+        // ── Init ─────────────────────────────────────────────────────────
+        document.getElementById('emptyState').style.display = 'block';
+    </script>
+</body>
+</html>
