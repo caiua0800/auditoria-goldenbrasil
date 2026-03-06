@@ -10,7 +10,6 @@ import { PlanilhasModule } from './planilhas/planilhas.module';
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      // Removi os parâmetros da URL para deixar a configuração apenas no objeto SSL
       url: process.env.DATABASE_URL,
       autoLoadEntities: true,
       synchronize: true, 
