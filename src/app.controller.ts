@@ -1,11 +1,9 @@
-import { Controller, Get, Redirect } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Controller, Get } from '@nestjs/common';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
-
-  @Get()
-  @Redirect('/planilhas', 302)
-  getHello() {}
+  @Get('health')
+  health() {
+    return { status: 'ok' };
+  }
 }
